@@ -1,0 +1,21 @@
+#--------------------------------------------------#
+# The following was generated with gitignore.nvim: #
+#--------------------------------------------------#
+# Gitignore for the following technologies: pydev
+
+#ignore all
+/*
+/*/
+
+#except for the following
+
+!/设置.xlsx
+!/app.py
+!/data.xlsx
+!/demo.py
+# !/ozon住宅与花园1.2.xlsx
+# !/ozon_test2.xlsx
+# !/ozon_test_output.csv
+# !/ozon_test_output_pivot.csv
+!/to_mongdb.py
+!/.gitignore
