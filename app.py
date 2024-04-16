@@ -86,6 +86,7 @@ class Category(BaseModel):
     label: list
     formdata: dict
     page: int = 1  # 这里应该是类属性，不是字典的一部分
+    sort: dict
 
 @app.get("/")
 async def read_root():
@@ -143,9 +144,32 @@ async def create_category_list(category: Category):
     query.update(formdata)
     query = {key: value for key, value in query.items() if value != {}}
     query = convert_query(query)
+    try:
+        if query['ID']:
+            query['ID'] = int(query['ID'])
+    except Exception as e:
+        ic(e)
+    try:
+        sorts_dict = category.sort
+        for key, value in sorts_dict.items():
+            if value == "descending":
+                sorts_dict[key] = -1
+            else:
+                sorts_dict[key] = 1
+    except Exception as e:
+        ic(e)
+
+
     # 不返回_id
     ic(query)
-    result = collection_category.find(query, {"_id":0}).skip(skip).limit(limit)
+    try:
+        if not category.sort:
+            result = collection_category.find(query, {"_id":0}).skip(skip).limit(limit)
+        else:
+            result = collection_category.find(query, {"_id":0}).sort(sorts_dict).skip(skip).limit(limit)
+    except Exception as e:
+        ic(e)
+    # result = collection_category.find(query, {"_id":0}).skip(skip).limit(limit)
     
     # 将MongoDB文档转换为可序列化的格式
     # for doc in result:
