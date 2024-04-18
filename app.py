@@ -70,13 +70,10 @@ async def del_product(product: Product):
 @app.get("/get_save_product/")
 async def SearchProduct(page: int = 1):
     skip = (page - 1) * 50
-    cursor = collection_save_product.find({}, {"_id":0}).limit(50).skip(skip)
-    id_list = [doc['ID'] for doc in cursor]  # 提取ID列表
-    id_list = set(id_list)  # 去重
-    id_list = list(id_list) # 转换为列表
-    id_list = [int(id) for id in id_list]
+    cursor = collection_save_product.distinct("ID")
+    id_list = [int(id) for id in cursor]
     ic(id_list)
-    result = collection_product.find({"ID": {"$in": id_list}}, {"_id":0})
+    result = collection_product.find({"ID": {"$in": id_list}}, {"_id":0}).limit(50).skip(skip)
 
     return list(result)
 
