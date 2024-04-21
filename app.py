@@ -83,7 +83,7 @@ class Category(BaseModel):
     label: list
     formdata: dict
     page: int = 1  # 这里应该是类属性，不是字典的一部分
-    sort: dict
+    sort: dict = {"28日销量":"ascending"}
 
 @app.get("/")
 async def read_root():
@@ -146,26 +146,15 @@ async def create_category_list(category: Category):
             query['ID'] = int(query['ID'])
     except Exception as e:
         ic(e)
-    try:
-        sorts_dict = category.sort
-        for key, value in sorts_dict.items():
-            if value == "descending":
-                sorts_dict[key] = -1
-            else:
-                sorts_dict[key] = 1
-    except Exception as e:
-        ic(e)
-
-
-    # 不返回_id
-    ic(query)
-    try:
-        if not category.sort:
-            result = collection_category.find(query, {"_id":0}).skip(skip).limit(limit)
+    sorts_dict = category_dict.sort
+    if not sorts_dict:
+        sorts_dict.sort = {"28日销量":"descending"}
+    for key, value in sorts_dict.items():
+        if value == "descending":
+            sorts_dict[key] = -1
         else:
-            result = collection_category.find(query, {"_id":0}).sort(sorts_dict).skip(skip).limit(limit)
-    except Exception as e:
-        ic(e)
+            sorts_dict[key] = 1
+    result = collection_category.find(query, {"_id":0}).sort(sorts_dict).skip(skip).limit(limit)
     # result = collection_category.find(query, {"_id":0}).skip(skip).limit(limit)
     
     # 将MongoDB文档转换为可序列化的格式
@@ -241,8 +230,24 @@ async def create_product_list(product: Category):
     query = {key: value for key, value in query.items() if value != {}}
     query = convert_query(query)
     ic(query)
+    try:
+        if query['ID']:
+            query['ID'] = int(query['ID'])
+    except Exception as e:
+        ic(e)
+    ic(query)
+    if not product_dict.sort:
+        product_dict.sort = {"28日销量":"descending"}
+
+    sorts_dict = product_dict.sort
+    for key, value in sorts_dict.items():
+        if value == "descending":
+            sorts_dict[key] = -1
+        else:
+            sorts_dict[key] = 1
+    result = collection_category.find(query, {"_id":0}).sort(sorts_dict).skip(skip).limit(limit)
     #不返回_id
-    result = collection_product.find(query, {"_id":0}).skip(skip).limit(limit)
+    # result = collection_product.find(query, {"_id":0}).skip(skip).limit(limit)
     
     # 将MongoDB文档转换为可序列化的格式
     # for doc in result:
